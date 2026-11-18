@@ -31,33 +31,109 @@ function electromart_setup() {
 add_action( 'after_setup_theme', 'electromart_setup' );
 
 /**
- * بارگذاری بهینه فایل‌های CSS، فونت فارسی Vazirmatn و اسکریپت‌های تعاملی
+ * آدرس تصاویر داخلی قالب
+ */
+function electromart_img( $name ) {
+	return get_template_directory_uri() . '/assets/images/' . $name;
+}
+
+/**
+ * بارگذاری فایل‌های CSS، فونت Vazirmatn و اسکریپت‌ها
  */
 function electromart_scripts() {
+	$ver = wp_get_theme()->get( 'Version' );
 	wp_enqueue_style( 'vazirmatn-font', 'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css', array(), '33.003' );
-	wp_enqueue_style( 'electromart-main', get_template_directory_uri() . '/assets/css/main.css', array( 'vazirmatn-font' ), '1.0.0' );
+	wp_enqueue_style( 'electromart-style', get_stylesheet_uri(), array(), $ver );
+	wp_style_add_data( 'electromart-style', 'rtl', 'replace' );
+	wp_enqueue_style( 'electromart-main', get_template_directory_uri() . '/assets/css/main.css', array( 'vazirmatn-font', 'electromart-style' ), $ver );
 
-	// تزریق متغیرهای رنگی از پنل تنظیمات وردپرس
-	$primary_color  = get_theme_mod( 'em_primary_color', '#0052FF' );
-	$discount_color = get_theme_mod( 'em_discount_color', '#EF4444' );
-	$grid_cols      = absint( get_theme_mod( 'em_products_per_row', 4 ) );
+	$primary_color  = sanitize_hex_color( get_theme_mod( 'em_primary_color', '#0052FF' ) ) ?: '#0052FF';
+	$discount_color = sanitize_hex_color( get_theme_mod( 'em_discount_color', '#EF4444' ) ) ?: '#EF4444';
+	$grid_cols      = max( 3, min( 5, absint( get_theme_mod( 'em_products_per_row', 4 ) ) ) );
 
-	$custom_css = "
-		:root {
-			--em-primary: " . esc_attr( $primary_color ) . ";
-			--em-discount: " . esc_attr( $discount_color ) . ";
-			--em-grid-cols: " . esc_attr( $grid_cols ) . ";
-		}
-	";
-	wp_add_inline_style( 'electromart-main', $custom_css );
+	wp_add_inline_style( 'electromart-main', ":root{--em-primary:{$primary_color};--em-discount:{$discount_color};--em-grid-cols:{$grid_cols};}" );
 
-	wp_enqueue_script( 'electromart-js', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), '1.0.0', true );
+	wp_enqueue_script( 'electromart-js', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), $ver, true );
 	wp_localize_script( 'electromart-js', 'EM_Config', array(
-		'ajax_url' => admin_url( 'admin-ajax.php' ),
-		'nonce'    => wp_create_nonce( 'em_ajax_nonce' ),
+		'ajax_url'  => admin_url( 'admin-ajax.php' ),
+		'nonce'     => is_user_logged_in() ? wp_create_nonce( 'em_ajax_nonce' ) : '',
+		'category'  => ( function_exists( 'is_product_category' ) && is_product_category() ) ? get_queried_object()->slug : '',
+		'i18n'      => array(
+			'noResults' => 'محصولی یافت نشد.',
+			'loading'   => 'در حال بارگذاری...',
+		),
 	) );
 }
 add_action( 'wp_enqueue_scripts', 'electromart_scripts' );
+
+/**
+ * کوئری محصولات صفحه اصلی با رعایت تنظیمات نمایش ووکامرس (مخفی / ناموجود)
+ */
+function electromart_product_query( $args ) {
+	$defaults = array(
+		'post_type'      => 'product',
+		'post_status'    => 'publish',
+		'posts_per_page' => 8,
+		'no_found_rows'  => true,
+	);
+	$args = wp_parse_args( $args, $defaults );
+	if ( class_exists( 'ElectroMart_Core' ) ) {
+		$args['tax_query'] = array( ElectroMart_Core::visibility_tax_query() ); // phpcs:ignore WordPress.DB.SlowDBQuery
+	}
+	return new WP_Query( $args );
+}
+
+function electromart_render_products( $args ) {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+	$query = electromart_product_query( $args );
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		wc_get_template_part( 'content', 'product' );
+	}
+	wp_reset_postdata();
+}
+
+/** لینک یک دسته‌بندی محصول بر اساس نامک؛ اگر نبود، فروشگاه */
+function electromart_cat_link( $slug ) {
+	if ( taxonomy_exists( 'product_cat' ) ) {
+		$term = get_term_by( 'slug', $slug, 'product_cat' );
+		if ( $term ) {
+			return get_term_link( $term );
+		}
+	}
+	return electromart_shop_url();
+}
+
+function electromart_shop_url() {
+	return class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+}
+
+function electromart_wishlist_url() {
+	$id = (int) get_option( 'em_wishlist_page_id' );
+	return $id ? get_permalink( $id ) : electromart_shop_url();
+}
+
+/**
+ * منوی پیش‌فرض وقتی هنوز منویی به جایگاه «اصلی» اختصاص داده نشده
+ */
+function electromart_primary_fallback() {
+	echo '<li><a href="' . esc_url( electromart_shop_url() ) . '">فروشگاه</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/#em-special-deals' ) ) . '">تخفیف‌های ویژه</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/#em-brands-section' ) ) . '">برندها</a></li>';
+}
+
+function electromart_footer_fallback() {
+	$cats = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'number' => 4, 'parent' => 0, 'exclude' => get_option( 'default_product_cat' ) ) );
+	echo '<ul>';
+	if ( ! is_wp_error( $cats ) ) {
+		foreach ( $cats as $cat ) {
+			echo '<li><a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a></li>';
+		}
+	}
+	echo '</ul>';
+}
 
 /**
  * بروزرسانی زنده شمارنده و محتوای Mini Cart کشویی با AJAX ووکامرس
@@ -65,7 +141,7 @@ add_action( 'wp_enqueue_scripts', 'electromart_scripts' );
 function electromart_cart_fragments( $fragments ) {
 	ob_start();
 	?>
-	<span class="em-cart-count"><?php echo WC()->cart ? esc_html( WC()->cart->get_cart_contents_count() ) : 0; ?></span>
+	<span class="em-badge-count em-cart-count"><?php echo WC()->cart ? esc_html( WC()->cart->get_cart_contents_count() ) : 0; ?></span>
 	<?php
 	$fragments['span.em-cart-count'] = ob_get_clean();
 
@@ -153,6 +229,7 @@ function electromart_customize_register( $wp_customize ) {
 	$wp_customize->add_setting( 'em_hero_image', array(
 		'default'           => '',
 		'sanitize_callback' => 'esc_url_raw',
+		// خالی = استفاده از تصویر پیش‌فرض داخل قالب
 	) );
 	$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'em_hero_image', array(
 		'label'   => 'تصویر شاخص بنر Hero',

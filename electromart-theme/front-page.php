@@ -10,19 +10,13 @@
 				<h1 class="em-hero-title"><?php echo esc_html( get_theme_mod( 'em_hero_title', 'فراتر از مرزهای تکنولوژی و صدا.' ) ); ?></h1>
 				<p class="em-hero-subtitle"><?php echo esc_html( get_theme_mod( 'em_hero_subtitle', 'تجربه نسل جدید لپ‌تاپ‌ها، موبایل، تجهیزات صوتی و گیمینگ با ضمانت اصالت کالا' ) ); ?></p>
 				<div class="em-hero-actions">
-					<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-btn em-btn-dark">مشاهده و خرید آنلاین</a>
+					<a href="<?php echo esc_url( electromart_shop_url() ); ?>" class="em-btn em-btn-dark">مشاهده و خرید آنلاین</a>
 					<a href="#em-shop-collection" class="em-btn em-btn-primary">کاوش دسته‌بندی‌ها</a>
 				</div>
 			</div>
 			<div class="em-hero-visual">
-				<?php $hero_img = get_theme_mod( 'em_hero_image' ); ?>
-				<?php if ( $hero_img ) : ?>
-					<img src="<?php echo esc_url( $hero_img ); ?>" alt="محصول شاخص" class="em-hero-img">
-				<?php else : ?>
-					<div class="em-hero-mockup">
-						<div class="em-floating-device">PRO SERIES X</div>
-					</div>
-				<?php endif; ?>
+				<?php $hero_img = get_theme_mod( 'em_hero_image' ) ?: electromart_img( 'hero.jpg' ); ?>
+				<img src="<?php echo esc_url( $hero_img ); ?>" alt="هدفون و لپ‌تاپ" class="em-hero-img" fetchpriority="high">
 			</div>
 		</div>
 	</section>
@@ -58,21 +52,22 @@
 		<div class="em-container">
 			<div class="em-section-header">
 				<h2 class="em-section-title">دسته‌بندی‌های تخصصی الکترونیک</h2>
-				<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-view-all">همه دسته‌بندی‌ها ←</a>
+				<a href="<?php echo esc_url( electromart_shop_url() ); ?>" class="em-view-all">همه دسته‌بندی‌ها ←</a>
 			</div>
 			<div class="em-cat-pills-grid">
 				<?php
 				$electronic_cats = array(
-					array( 'title' => 'موبایل و تبلت', 'sub' => 'پرچمدار و میان‌رده' ),
-					array( 'title' => 'لپ‌تاپ و کامپیوتر', 'sub' => 'مهندسی و اولترابوک' ),
-					array( 'title' => 'هدفون و هندزفری', 'sub' => 'حذف نویز هوشمند' ),
-					array( 'title' => 'ساعت هوشمند', 'sub' => 'پایش سلامت و ورزش' ),
-					array( 'title' => 'کنسول و گیمینگ', 'sub' => 'PS5، Xbox و جانبی' ),
-					array( 'title' => 'دوربین و عکاسی', 'sub' => 'بدون آینه و لنز' ),
+					array( 'slug' => 'mobile-tablet', 'title' => 'موبایل و تبلت', 'sub' => 'پرچمدار و میان‌رده', 'img' => 'cat-phone.jpg' ),
+					array( 'slug' => 'laptop-computer', 'title' => 'لپ‌تاپ و کامپیوتر', 'sub' => 'مهندسی و اولترابوک', 'img' => 'cat-laptop.jpg' ),
+					array( 'slug' => 'audio', 'title' => 'هدفون و صوتی', 'sub' => 'حذف نویز هوشمند', 'img' => 'cat-headphones.jpg' ),
+					array( 'slug' => 'smartwatch', 'title' => 'ساعت هوشمند', 'sub' => 'پایش سلامت و ورزش', 'img' => 'cat-watch.jpg' ),
+					array( 'slug' => 'gaming', 'title' => 'کنسول و گیمینگ', 'sub' => 'PS5، Xbox و جانبی', 'img' => 'cat-console.jpg' ),
+					array( 'slug' => 'camera', 'title' => 'دوربین و عکاسی', 'sub' => 'بدون آینه و لنز', 'img' => 'cat-camera.jpg' ),
 				);
 				foreach ( $electronic_cats as $cat_item ) :
 				?>
-					<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-cat-pill-card">
+					<a href="<?php echo esc_url( electromart_cat_link( $cat_item['slug'] ) ); ?>" class="em-cat-pill-card">
+						<img src="<?php echo esc_url( electromart_img( $cat_item['img'] ) ); ?>" alt="<?php echo esc_attr( $cat_item['title'] ); ?>" loading="lazy">
 						<strong><?php echo esc_html( $cat_item['title'] ); ?></strong>
 						<span><?php echo esc_html( $cat_item['sub'] ); ?></span>
 					</a>
@@ -86,26 +81,10 @@
 		<div class="em-container">
 			<div class="em-section-header">
 				<h2 class="em-section-title">جدیدترین محصولات (New Arrivals)</h2>
-				<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-view-all">مشاهده همه ←</a>
+				<a href="<?php echo esc_url( electromart_shop_url() ); ?>" class="em-view-all">مشاهده همه ←</a>
 			</div>
 			<div class="em-products-grid">
-				<?php
-				if ( class_exists( 'WooCommerce' ) ) {
-					$new_query = new WP_Query( array(
-						'post_type'      => 'product',
-						'posts_per_page' => 8,
-						'orderby'        => 'date',
-						'order'          => 'DESC',
-					) );
-					if ( $new_query->have_posts() ) {
-						while ( $new_query->have_posts() ) {
-							$new_query->the_post();
-							wc_get_template_part( 'content', 'product' );
-						}
-						wp_reset_postdata();
-					}
-				}
-				?>
+				<?php electromart_render_products( array( 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => 8 ) ); ?>
 			</div>
 		</div>
 	</section>
@@ -117,26 +96,26 @@
 				<h2 class="em-section-title">کالکشن منتخب (Shop Collection)</h2>
 			</div>
 			<div class="em-bento-collection">
-				<div class="em-bento-card em-bento-tall">
+				<div class="em-bento-card em-bento-tall" style="background-image:url(<?php echo esc_url( electromart_img( 'bento-audio.jpg' ) ); ?>)">
 					<div class="em-bento-text">
 						<span class="em-bento-tag">صدا و تصویر حرفه‌ای</span>
 						<h3>هدفون، اسپیکر و تجهیزات صوتی</h3>
-						<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-bento-link">مشاهده کالکشن ←</a>
+						<a href="<?php echo esc_url( electromart_cat_link( 'audio' ) ); ?>" class="em-bento-link">مشاهده کالکشن ←</a>
 					</div>
 				</div>
 				<div class="em-bento-stack">
-					<div class="em-bento-card em-bento-wide">
+					<div class="em-bento-card em-bento-wide" style="background-image:url(<?php echo esc_url( electromart_img( 'bento-laptop.jpg' ) ); ?>)">
 						<div class="em-bento-text">
 							<span class="em-bento-tag">پردازش قدرتمند</span>
 							<h3>لپ‌تاپ، مانیتور و تجهیزات کامپیوتر</h3>
-							<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-bento-link">مشاهده کالکشن ←</a>
+							<a href="<?php echo esc_url( electromart_cat_link( 'laptop-computer' ) ); ?>" class="em-bento-link">مشاهده کالکشن ←</a>
 						</div>
 					</div>
-					<div class="em-bento-card em-bento-wide">
+					<div class="em-bento-card em-bento-wide" style="background-image:url(<?php echo esc_url( electromart_img( 'bento-mobile.jpg' ) ); ?>)">
 						<div class="em-bento-text">
 							<span class="em-bento-tag">اکوسیستم هوشمند</span>
 							<h3>موبایل، ساعت هوشمند و لوازم جانبی</h3>
-							<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-bento-link">مشاهده کالکشن ←</a>
+							<a href="<?php echo esc_url( electromart_cat_link( 'mobile-tablet' ) ); ?>" class="em-bento-link">مشاهده کالکشن ←</a>
 						</div>
 					</div>
 				</div>
@@ -151,24 +130,7 @@
 				<h2 class="em-section-title">محصولات محبوب (Popular Products)</h2>
 			</div>
 			<div class="em-products-grid">
-				<?php
-				if ( class_exists( 'WooCommerce' ) ) {
-					$popular_query = new WP_Query( array(
-						'post_type'      => 'product',
-						'posts_per_page' => 8,
-						'meta_key'       => '_wc_average_rating',
-						'orderby'        => 'meta_value_num',
-						'order'          => 'DESC',
-					) );
-					if ( $popular_query->have_posts() ) {
-						while ( $popular_query->have_posts() ) {
-							$popular_query->the_post();
-							wc_get_template_part( 'content', 'product' );
-						}
-						wp_reset_postdata();
-					}
-				}
-				?>
+				<?php electromart_render_products( array( 'meta_key' => '_wc_average_rating', 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => 4 ) ); ?>
 			</div>
 		</div>
 	</section>
@@ -176,12 +138,12 @@
 	<!-- بخش ۹ و ۱۲: بنرهای تبلیغاتی و پیشنهادهای شگفت‌انگیز (Special Deals) -->
 	<section id="em-special-deals" class="em-section">
 		<div class="em-container">
-			<div class="em-promo-banner">
+			<div class="em-promo-banner" style="background-image:url(<?php echo esc_url( electromart_img( 'promo-gaming.jpg' ) ); ?>)">
 				<div class="em-promo-content">
 					<span class="em-promo-badge">پیشنهاد ویژه محدود</span>
 					<h2>تجهیزات گیمینگ، کنسول‌های نسل نهم و مانیتورهای اولتراواید</h2>
 					<p>با تخفیف ویژه و ارسال فوری به سراسر کشور</p>
-					<a href="<?php echo esc_url( class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'shop' ) : '#' ); ?>" class="em-btn em-btn-primary">مشاهده پیشنهادهای ویژه</a>
+					<a href="<?php echo esc_url( electromart_cat_link( 'gaming' ) ); ?>" class="em-btn em-btn-primary">مشاهده پیشنهادهای ویژه</a>
 				</div>
 			</div>
 
@@ -189,22 +151,11 @@
 				$sale_ids = wc_get_product_ids_on_sale();
 				if ( ! empty( $sale_ids ) ) :
 			?>
-				<div class="em-section-header" style="margin-top: 40px;">
+				<div class="em-section-header em-mt-40">
 					<h2 class="em-section-title">محصولات دارای تخفیف ویژه</h2>
 				</div>
 				<div class="em-products-grid">
-					<?php
-					$sale_query = new WP_Query( array(
-						'post_type'      => 'product',
-						'posts_per_page' => 4,
-						'post__in'       => $sale_ids,
-					) );
-					while ( $sale_query->have_posts() ) {
-						$sale_query->the_post();
-						wc_get_template_part( 'content', 'product' );
-					}
-					wp_reset_postdata();
-					?>
+					<?php electromart_render_products( array( 'post__in' => array_merge( array( 0 ), $sale_ids ), 'posts_per_page' => 4 ) ); ?>
 				</div>
 			<?php endif; endif; ?>
 		</div>
@@ -217,24 +168,7 @@
 				<h2 class="em-section-title">پرفروش‌ترین‌های فروشگاه</h2>
 			</div>
 			<div class="em-products-grid">
-				<?php
-				if ( class_exists( 'WooCommerce' ) ) {
-					$best_query = new WP_Query( array(
-						'post_type'      => 'product',
-						'posts_per_page' => 4,
-						'meta_key'       => 'total_sales',
-						'orderby'        => 'meta_value_num',
-						'order'          => 'DESC',
-					) );
-					if ( $best_query->have_posts() ) {
-						while ( $best_query->have_posts() ) {
-							$best_query->the_post();
-							wc_get_template_part( 'content', 'product' );
-						}
-						wp_reset_postdata();
-					}
-				}
-				?>
+				<?php electromart_render_products( array( 'meta_key' => 'total_sales', 'orderby' => 'meta_value_num', 'order' => 'DESC', 'posts_per_page' => 4 ) ); ?>
 			</div>
 		</div>
 	</section>
@@ -247,9 +181,9 @@
 			</div>
 			<div class="em-brands-grid">
 				<?php
-				$brand_terms = get_terms( array(
+				$brand_terms = ! taxonomy_exists( 'product_brand' ) ? array() : get_terms( array(
 					'taxonomy'   => 'product_brand',
-					'hide_empty' => false,
+					'hide_empty' => true,
 					'number'     => 8,
 				) );
 				if ( ! empty( $brand_terms ) && ! is_wp_error( $brand_terms ) ) :
@@ -271,7 +205,7 @@
 
 	<!-- بخش ۱۳: محصولات اخیراً مشاهده‌شده توسط کاربر -->
 	<?php
-	$viewed_ids = isset( $_COOKIE['em_recently_viewed'] ) ? array_filter( array_map( 'absint', explode( ',', sanitize_text_field( $_COOKIE['em_recently_viewed'] ) ) ) ) : array();
+	$viewed_ids = class_exists( 'ElectroMart_Core' ) ? ElectroMart_Core::cookie_ids( 'em_recently_viewed' ) : array();
 	if ( ! empty( $viewed_ids ) && class_exists( 'WooCommerce' ) ) :
 	?>
 	<section class="em-section">
@@ -280,19 +214,7 @@
 				<h2 class="em-section-title">بازدیدهای اخیر شما</h2>
 			</div>
 			<div class="em-products-grid">
-				<?php
-				$viewed_query = new WP_Query( array(
-					'post_type'      => 'product',
-					'posts_per_page' => 4,
-					'post__in'       => $viewed_ids,
-					'orderby'        => 'post__in',
-				) );
-				while ( $viewed_query->have_posts() ) {
-					$viewed_query->the_post();
-					wc_get_template_part( 'content', 'product' );
-				}
-				wp_reset_postdata();
-				?>
+				<?php electromart_render_products( array( 'post__in' => $viewed_ids, 'orderby' => 'post__in', 'posts_per_page' => 4 ) ); ?>
 			</div>
 		</div>
 	</section>

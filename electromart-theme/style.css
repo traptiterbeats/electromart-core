@@ -1,13 +1,15 @@
 /*
 Theme Name: ElectroMart
-Theme URI: https://example.com/electromart
-Author: ElectroMart Architecture
-Description: قالب فروشگاهی اختصاصی، مینیمال و لوکس ویژه فروشگاه‌های لوازم الکترونیکی و دیجیتال، سازگار با WooCommerce.
-Version: 1.0.0
+Theme URI: https://github.com/traptiterbeats/electromart-core
+Author: ElectroMart
+Description: قالب فروشگاهی مینیمال و راست‌چین ویژه فروشگاه‌های لوازم الکترونیکی و دیجیتال، سازگار با WooCommerce. برای امکانات کامل، افزونه ElectroMart Core را هم نصب کنید.
+Version: 1.1.0
 Requires at least: 6.2
-Tested up to: 6.7
+Requires PHP: 7.4
+Tested up to: 7.1
 WC requires at least: 8.0
-WC tested up to: 9.5
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: electromart
+Tags: e-commerce, rtl-language-support, custom-logo, custom-menu
 */
-

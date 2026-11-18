@@ -2,6 +2,7 @@
 
 <div class="em-container em-single-product-wrap">
 	<?php while ( have_posts() ) : the_post(); global $product; ?>
+		<?php do_action( 'woocommerce_before_single_product' ); ?>
 		<article id="product-<?php the_ID(); ?>" <?php wc_product_class( 'em-single-product', $product ); ?>>
 
 			<div class="em-single-top-grid">
@@ -13,7 +14,7 @@
 				<!-- اطلاعات خرید، قیمت، ویژگی‌های متغیر و موجودی -->
 				<div class="em-single-summary">
 					<?php
-					$brands = wp_get_post_terms( get_the_ID(), 'product_brand', array( 'fields' => 'names' ) );
+					$brands = taxonomy_exists( 'product_brand' ) ? wp_get_post_terms( get_the_ID(), 'product_brand', array( 'fields' => 'names' ) ) : array();
 					if ( ! empty( $brands ) && ! is_wp_error( $brands ) ) :
 					?>
 						<span class="em-single-brand">برند: <?php echo esc_html( $brands[0] ); ?></span>
@@ -63,20 +64,13 @@
 				<div id="tab-specs" class="em-tab-panel">
 					<h3>جدول مشخصات فنی</h3>
 					<?php
-					$specs = get_post_meta( get_the_ID(), '_em_tech_specs', true );
-					$labels = array(
-						'model'        => 'مدل دقیق دستگاه',
-						'processor'    => 'پردازنده / تراشه',
-						'display'      => 'صفحه نمایش',
-						'memory'       => 'حافظه رم و داخلی',
-						'connectivity' => 'پورت‌ها و ارتباطات',
-						'battery'      => 'باتری و منبع تغذیه',
-						'warranty'     => 'گارانتی و خدمات',
-					);
+					$specs  = get_post_meta( get_the_ID(), '_em_tech_specs', true );
+					$specs  = is_array( $specs ) ? $specs : array();
+					$labels = class_exists( 'ElectroMart_Core' ) ? ElectroMart_Core::spec_labels() : array();
 					?>
 					<table class="em-specs-table">
 						<tbody>
-							<?php foreach ( $labels as $k => $lbl ) : if ( ! empty( $specs[ $k ] ) ) : ?>
+							<?php foreach ( $labels as $k => $lbl ) : if ( ! empty( $specs[ $k ] ) && '—' !== $specs[ $k ] ) : ?>
 								<tr>
 									<th><?php echo esc_html( $lbl ); ?></th>
 									<td><?php echo esc_html( $specs[ $k ] ); ?></td>
@@ -99,6 +93,12 @@
 			</div>
 
 		</article>
+		<?php
+		if ( isset( WC()->structured_data ) ) {
+			WC()->structured_data->generate_product_data();
+		}
+		do_action( 'woocommerce_after_single_product' );
+		?>
 	<?php endwhile; ?>
 </div>
 

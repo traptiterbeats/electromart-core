@@ -1,32 +1,59 @@
-jQuery(document).ready(function ($) {
+jQuery(function ($) {
 	'use strict';
 
-	// ۱. منوی موبایل و سبد خرید کشویی (Mini Cart)
+	var cfg = window.EM_Config || {};
+
+	function esc(str) {
+		return String(str == null ? '' : str)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+	}
+
+	function post(action, data) {
+		return $.post(cfg.ajax_url, $.extend({ action: action, nonce: cfg.nonce }, data || {}));
+	}
+
+	// ۱. منوی موبایل و سبد خرید کشویی
 	$('.em-mobile-menu-toggle').on('click', function () {
-		$('.em-main-nav').toggleClass('mobile-open');
+		var open = $('.em-main-nav').toggleClass('mobile-open').hasClass('mobile-open');
+		$(this).attr('aria-expanded', open ? 'true' : 'false');
 	});
 
 	function closeAllOverlays() {
 		$('.em-drawer, .em-modal, #em-backdrop').removeClass('open');
+		$('body').removeClass('em-no-scroll');
+	}
+
+	function openOverlay(sel) {
+		$(sel + ', #em-backdrop').addClass('open');
+		$('body').addClass('em-no-scroll');
 	}
 
 	$('.em-cart-trigger').on('click', function () {
-		$('#em-mini-cart-drawer, #em-backdrop').addClass('open');
+		openOverlay('#em-mini-cart-drawer');
 	});
 
-	$('.em-close-drawer, .em-modal-close, #em-backdrop').on('click', closeAllOverlays);
+	$(document).on('click', '.em-close-drawer, .em-modal-close, #em-backdrop', closeAllOverlays);
+	$(document).on('keyup', function (e) {
+		if (e.key === 'Escape') closeAllOverlays();
+	});
 
-	// باز شدن خودکار Mini Cart پس از افزودن محصول با AJAX
 	$(document.body).on('added_to_cart', function () {
-		$('#em-mini-cart-drawer, #em-backdrop').addClass('open');
+		$('#em-quickview-modal').removeClass('open');
+		openOverlay('#em-mini-cart-drawer');
 	});
 
-	// ۲. جستجوی زنده AJAX (Live Search)
-	let searchTimer = null;
-	$('#em-live-search-input').on('keyup', function () {
+	// ۲. جستجوی زنده (خروجی سرور escape می‌شود تا XSS ممکن نباشد)
+	var searchTimer = null;
+	var searchXhr = null;
+	var $dropdown = $('#em-search-results');
+
+	$('#em-live-search-input').on('input', function () {
 		clearTimeout(searchTimer);
-		const keyword = $(this).val().trim();
-		const $dropdown = $('#em-search-results');
+		var keyword = $(this).val().trim();
 
 		if (keyword.length < 2) {
 			$dropdown.hide().empty();
@@ -34,88 +61,102 @@ jQuery(document).ready(function ($) {
 		}
 
 		searchTimer = setTimeout(function () {
-			$.post(EM_Config.ajax_url, {
-				action: 'em_live_search',
-				nonce: EM_Config.nonce,
-				keyword: keyword
-			}, function (res) {
-				if (res.success && res.data.length > 0) {
-					let html = '';
-					res.data.forEach(function (item) {
-						html += `
-							<a href="${item.url}" class="em-search-item">
-								<img src="${item.image}" alt="${item.title}">
-								<div>
-									<div style="font-weight:700;font-size:0.86rem;">${item.title}</div>
-									<div style="font-size:0.8rem;color:#0052FF;">${item.price}</div>
-								</div>
-							</a>
-						`;
-					});
+			if (searchXhr) searchXhr.abort();
+			searchXhr = post('em_live_search', { keyword: keyword }).done(function (res) {
+				if (res && res.success && res.data.length) {
+					var html = res.data.map(function (item) {
+						return '<a href="' + esc(item.url) + '" class="em-search-item">' +
+							'<img src="' + esc(item.image) + '" alt="">' +
+							'<div><div class="em-search-title">' + esc(item.title) + '</div>' +
+							// قیمت HTML آماده ووکامرس است که سمت سرور با wp_kses_post پاک‌سازی شده
+							'<div class="em-search-price">' + item.price + '</div></div></a>';
+					}).join('');
 					$dropdown.html(html).show();
 				} else {
-					$dropdown.html('<div style="padding:14px;font-size:0.85rem;color:#6B7280;">محصولی یافت نشد.</div>').show();
+					$dropdown.html('<div class="em-search-empty">' + esc(cfg.i18n.noResults) + '</div>').show();
 				}
 			});
 		}, 300);
 	});
 
-	// ۳. مشاهده سریع محصول (Quick View AJAX)
-	$(document).on('click', '.em-quickview-btn', function () {
-		const productId = $(this).data('id');
-		$('#em-quickview-body').html('<p style="text-align:center;padding:30px;">در حال بارگذاری مشخصات محصول...</p>');
-		$('#em-quickview-modal, #em-backdrop').addClass('open');
+	$(document).on('click', function (e) {
+		if (!$(e.target).closest('.em-search-wrapper').length) $dropdown.hide();
+	});
 
-		$.post(EM_Config.ajax_url, {
-			action: 'em_quick_view',
-			nonce: EM_Config.nonce,
-			product_id: productId
-		}, function (res) {
-			if (res.success) {
+	// ۳. مشاهده سریع
+	$(document).on('click', '.em-quickview-btn', function () {
+		var productId = $(this).data('id');
+		$('#em-quickview-body').html('<p class="em-loading">' + esc(cfg.i18n.loading) + '</p>');
+		openOverlay('#em-quickview-modal');
+
+		post('em_quick_view', { product_id: productId }).done(function (res) {
+			if (res && res.success) {
 				$('#em-quickview-body').html(res.data.html);
 			}
 		});
 	});
 
-	// ۴. علاقه‌مندی‌ها (Wishlist AJAX)
-	$(document).on('click', '.em-wishlist-btn', function () {
-		const $btn = $(this);
-		const productId = $btn.data('id');
+	// ۴. علاقه‌مندی‌ها: وضعیت دکمه‌ها بعد از بارگذاری صفحه هم نشان داده می‌شود
+	function paintWishlist(ids) {
+		ids = (ids || []).map(Number);
+		$('.em-wishlist-count').text(ids.length);
+		$('.em-wishlist-btn').each(function () {
+			$(this).toggleClass('active', ids.indexOf(Number($(this).data('id'))) !== -1);
+		});
+	}
 
-		$.post(EM_Config.ajax_url, {
-			action: 'em_toggle_wishlist',
-			nonce: EM_Config.nonce,
-			product_id: productId
-		}, function (res) {
-			if (res.success) {
-				$btn.toggleClass('active', res.data.status === 'added');
-			}
+	post('em_get_wishlist').done(function (res) {
+		if (res && res.success) paintWishlist(res.data.ids);
+	});
+
+	$(document).on('click', '.em-wishlist-btn', function () {
+		var $btn = $(this);
+		$btn.addClass('is-loading');
+		post('em_toggle_wishlist', { product_id: $btn.data('id') }).done(function (res) {
+			if (res && res.success) paintWishlist(res.data.ids);
+		}).always(function () {
+			$btn.removeClass('is-loading');
 		});
 	});
 
-	// ۵. سیستم مقایسه محصولات (Compare List با LocalStorage + AJAX Table)
+	// ۵. مقایسه محصولات (LocalStorage + جدول AJAX)
 	function getCompareList() {
 		try {
-			return JSON.parse(localStorage.getItem('em_compare_ids') || '[]');
+			var list = JSON.parse(localStorage.getItem('em_compare_ids') || '[]');
+			return Array.isArray(list) ? list.map(Number).filter(Boolean) : [];
 		} catch (e) {
 			return [];
 		}
 	}
 
 	function saveCompareList(list) {
-		localStorage.setItem('em_compare_ids', JSON.stringify(list));
+		try {
+			localStorage.setItem('em_compare_ids', JSON.stringify(list));
+		} catch (e) {}
 		$('.em-compare-count').text(list.length);
+		$('.em-compare-btn').each(function () {
+			$(this).toggleClass('active', list.indexOf(Number($(this).data('id'))) !== -1);
+		});
 	}
 
 	saveCompareList(getCompareList());
 
-	$(document).on('click', '.em-compare-btn', function () {
-		const id = parseInt($(this).data('id'), 10);
-		let list = getCompareList();
-		if (!list.includes(id)) {
-			if (list.length >= 4) {
-				list.shift();
+	function openCompareModal() {
+		$('#em-compare-body').html('<p class="em-loading">' + esc(cfg.i18n.loading) + '</p>');
+		openOverlay('#em-compare-modal');
+
+		post('em_compare_table', { ids: getCompareList() }).done(function (res) {
+			if (res && res.success) {
+				$('#em-compare-body').html(res.data.html);
 			}
+		});
+	}
+
+	$(document).on('click', '.em-compare-btn', function () {
+		var id = Number($(this).data('id'));
+		var list = getCompareList();
+		if (list.indexOf(id) === -1) {
+			if (list.length >= 4) list.shift();
 			list.push(id);
 			saveCompareList(list);
 		}
@@ -125,65 +166,76 @@ jQuery(document).ready(function ($) {
 	$('.em-open-compare-modal').on('click', openCompareModal);
 
 	$(document).on('click', '.em-remove-compare', function () {
-		const id = parseInt($(this).data('id'), 10);
-		const list = getCompareList().filter(item => item !== id);
-		saveCompareList(list);
+		var id = Number($(this).data('id'));
+		saveCompareList(getCompareList().filter(function (item) { return item !== id; }));
 		openCompareModal();
 	});
 
-	function openCompareModal() {
-		const list = getCompareList();
-		$('#em-compare-body').html('<p style="padding:20px;">در حال آماده‌سازی جدول مقایسه...</p>');
-		$('#em-compare-modal, #em-backdrop').addClass('open');
+	// ۶. فیلتر و مرتب‌سازی AJAX با صفحه‌بندی
+	var $form = $('#em-ajax-filter-form');
+	var $grid = $('#em-products-container');
+	var filterXhr = null;
 
-		$.post(EM_Config.ajax_url, {
-			action: 'em_compare_table',
-			nonce: EM_Config.nonce,
-			ids: list
-		}, function (res) {
-			if (res.success) {
-				$('#em-compare-body').html(res.data.html);
-			}
-		});
-	}
-
-	// ۶. فیلتر و مرتب‌سازی AJAX محصولات بدون رفرش صفحه
-	function triggerAjaxFilter() {
-		const $form = $('#em-ajax-filter-form');
+	function triggerAjaxFilter(page) {
 		if (!$form.length) return;
+		if (filterXhr) filterXhr.abort();
 
-		const data = {
-			action: 'em_filter_products',
-			nonce: EM_Config.nonce,
-			category: $form.find('[name="category"]').val(),
-			brand: $form.find('[name="brand"]').val(),
-			max_price: $form.find('[name="max_price"]').val(),
+		$grid.addClass('is-loading');
+		filterXhr = post('em_filter_products', {
+			category: $form.find('[name="category"]').val() || '',
+			brand: $form.find('[name="brand"]').val() || '',
+			max_price: $form.find('[name="max_price"]').val() || '',
 			in_stock: $form.find('[name="in_stock"]').is(':checked') ? '1' : '0',
-			orderby: $('#em-sort-select').val()
-		};
-
-		$('#em-products-container').css('opacity', '0.45');
-		$.post(EM_Config.ajax_url, data, function (res) {
-			$('#em-products-container').css('opacity', '1');
-			if (res.success) {
-				$('#em-products-container').html(res.data.html);
+			orderby: $('#em-sort-select').val(),
+			paged: page || 1
+		}).done(function (res) {
+			if (res && res.success) {
+				$grid.html(res.data.html);
+				$('#em-pagination').html(res.data.pagination);
+				post('em_get_wishlist').done(function (r) {
+					if (r && r.success) paintWishlist(r.data.ids);
+				});
+				saveCompareList(getCompareList());
+				if (page && page > 1) {
+					$('html, body').animate({ scrollTop: $grid.offset().top - 120 }, 300);
+				}
 			}
+		}).always(function () {
+			$grid.removeClass('is-loading');
 		});
 	}
 
-	$('#em-ajax-filter-form').on('submit', function (e) {
+	$form.on('submit', function (e) {
 		e.preventDefault();
-		triggerAjaxFilter();
+		triggerAjaxFilter(1);
 	});
 
-	$('#em-sort-select').on('change', triggerAjaxFilter);
+	$('#em-sort-select').on('change', function () {
+		triggerAjaxFilter(1);
+	});
 
-	// ۷. تب‌های صفحه اختصاصی محصول
+	$(document).on('click', '.em-ajax-pagination a[data-page]', function (e) {
+		e.preventDefault();
+		triggerAjaxFilter(parseInt($(this).data('page'), 10));
+	});
+
+	// ۷. تب‌های صفحه محصول
 	$('.em-tab-trigger').on('click', function () {
-		const target = $(this).data('target');
+		var target = $(this).data('target');
 		$('.em-tab-trigger, .em-tab-panel').removeClass('active');
 		$(this).addClass('active');
 		$('#' + target).addClass('active');
 	});
-});
 
+	// ۸. خبرنامه
+	$('#em-newsletter-form').on('submit', function (e) {
+		e.preventDefault();
+		var $f = $(this);
+		var $msg = $('.em-newsletter-msg');
+		post('em_newsletter', { email: $f.find('[name="email"]').val() }).done(function (res) {
+			var ok = res && res.success;
+			$msg.toggleClass('is-error', !ok).text(res && res.data ? res.data.message : '');
+			if (ok) $f[0].reset();
+		});
+	});
+});
