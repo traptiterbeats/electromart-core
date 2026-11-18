@@ -1,0 +1,1048 @@
+:root {
+	--em-primary: #0052FF;
+	--em-dark: #111827;
+	--em-text: #1F2937;
+	--em-muted: #6B7280;
+	--em-bg: #FFFFFF;
+	--em-surface: #F4F5F7;
+	--em-border: #E5E7EB;
+	--em-discount: #EF4444;
+	--em-success: #10B981;
+	--em-radius: 12px;
+	--em-grid-cols: 4;
+	--em-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Vazirmatn', sans-serif;
+	background-color: var(--em-bg);
+	color: var(--em-text);
+	line-height: 1.65;
+	direction: rtl;
+	overflow-x: hidden;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	transition: var(--em-transition);
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+.em-container {
+	max-width: 1320px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+/* 1. نوار اطلاع‌رسانی مشکی بالای سایت */
+.em-topbar {
+	background-color: var(--em-dark);
+	color: #FFFFFF;
+	font-size: 0.85rem;
+	padding: 9px 0;
+}
+
+.em-topbar-inner {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 16px;
+}
+
+.em-topbar-cta {
+	color: #FBBF24;
+	font-weight: 600;
+	border-bottom: 1px solid #FBBF24;
+}
+
+/* 2. هدر مینیمال و مگامنو */
+.em-header {
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid var(--em-border);
+	position: sticky;
+	top: 0;
+	z-index: 100;
+}
+
+.em-header-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 76px;
+	gap: 24px;
+}
+
+.em-brand-text {
+	font-size: 1.55rem;
+	font-weight: 900;
+	color: var(--em-dark);
+	letter-spacing: -0.5px;
+}
+
+.em-brand-text span {
+	color: var(--em-primary);
+}
+
+.em-nav-list {
+	display: flex;
+	list-style: none;
+	gap: 28px;
+	font-weight: 500;
+	font-size: 0.95rem;
+}
+
+.em-nav-list > li > a:hover {
+	color: var(--em-primary);
+}
+
+.em-has-megamenu {
+	position: static;
+}
+
+.em-megamenu {
+	position: absolute;
+	top: 76px;
+	right: 0;
+	left: 0;
+	background: #FFFFFF;
+	border-bottom: 1px solid var(--em-border);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+	padding: 32px 0;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(10px);
+	transition: var(--em-transition);
+}
+
+.em-has-megamenu:hover .em-megamenu {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.em-megamenu-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 30px;
+}
+
+.em-mega-col h4 {
+	font-size: 0.95rem;
+	color: var(--em-dark);
+	margin-bottom: 14px;
+	padding-bottom: 8px;
+	border-bottom: 2px solid var(--em-surface);
+}
+
+.em-mega-col ul {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	font-size: 0.9rem;
+	color: var(--em-muted);
+}
+
+.em-mega-col ul a:hover {
+	color: var(--em-primary);
+	padding-right: 4px;
+}
+
+.em-mega-promo-card {
+	background: var(--em-surface);
+	padding: 24px;
+	border-radius: var(--em-radius);
+}
+
+/* جستجوی زنده و آیکون‌های هدر */
+.em-header-actions {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.em-search-wrapper {
+	position: relative;
+	width: 260px;
+}
+
+.em-search-wrapper input {
+	width: 100%;
+	background: var(--em-surface);
+	border: 1px solid transparent;
+	border-radius: 99px;
+	padding: 9px 18px;
+	font-family: inherit;
+	font-size: 0.88rem;
+	transition: var(--em-transition);
+}
+
+.em-search-wrapper input:focus {
+	outline: none;
+	background: #FFFFFF;
+	border-color: var(--em-primary);
+}
+
+.em-search-dropdown {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	left: 0;
+	background: #FFFFFF;
+	border: 1px solid var(--em-border);
+	border-radius: var(--em-radius);
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+	display: none;
+	z-index: 200;
+	max-height: 360px;
+	overflow-y: auto;
+}
+
+.em-search-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--em-surface);
+}
+
+.em-search-item img {
+	width: 44px;
+	height: 44px;
+	object-fit: contain;
+	background: var(--em-surface);
+	border-radius: 6px;
+}
+
+.em-icon-btn {
+	position: relative;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--em-dark);
+	transition: var(--em-transition);
+}
+
+.em-icon-btn:hover {
+	background: var(--em-surface);
+	color: var(--em-primary);
+}
+
+.em-badge-count {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	background: var(--em-primary);
+	color: #FFFFFF;
+	font-size: 0.7rem;
+	font-weight: 700;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 3. بنر اصلی (Hero Section) منطبق با تصویر مرجع */
+.em-hero-section {
+	background: linear-gradient(135deg, #F8FAFC 0%, #EFF2F6 100%);
+	padding: 72px 0;
+}
+
+.em-hero-grid {
+	display: grid;
+	grid-template-columns: 1.1fr 0.9fr;
+	align-items: center;
+	gap: 48px;
+}
+
+.em-hero-kicker {
+	display: inline-block;
+	color: var(--em-primary);
+	font-weight: 700;
+	font-size: 0.9rem;
+	margin-bottom: 12px;
+}
+
+.em-hero-title {
+	font-size: 3.1rem;
+	font-weight: 900;
+	color: var(--em-dark);
+	line-height: 1.2;
+	margin-bottom: 20px;
+}
+
+.em-hero-subtitle {
+	font-size: 1.08rem;
+	color: var(--em-muted);
+	margin-bottom: 32px;
+	max-width: 520px;
+}
+
+.em-hero-actions {
+	display: flex;
+	gap: 14px;
+}
+
+.em-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 13px 28px;
+	border-radius: 8px;
+	font-family: inherit;
+	font-weight: 600;
+	font-size: 0.95rem;
+	cursor: pointer;
+	border: 1px solid transparent;
+	transition: var(--em-transition);
+}
+
+.em-btn-dark {
+	background: var(--em-dark);
+	color: #FFFFFF;
+}
+
+.em-btn-dark:hover {
+	background: var(--em-primary);
+}
+
+.em-btn-primary {
+	background: var(--em-primary);
+	color: #FFFFFF;
+}
+
+.em-btn-primary:hover {
+	filter: brightness(1.1);
+}
+
+.em-btn-outline {
+	border-color: var(--em-border);
+	background: #FFFFFF;
+	color: var(--em-dark);
+}
+
+/* ۴ باکس خدمات زیر بنر اصلی (مطابق تصویر مرجع) */
+.em-features-strip {
+	padding: 40px 0 20px;
+}
+
+.em-features-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 24px;
+}
+
+.em-feature-card {
+	background: var(--em-surface);
+	padding: 28px 20px;
+	border-radius: var(--em-radius);
+	text-align: center;
+}
+
+.em-feature-icon {
+	font-size: 1.7rem;
+	margin-bottom: 10px;
+}
+
+.em-feature-card h4 {
+	font-size: 1rem;
+	color: var(--em-dark);
+	margin-bottom: 4px;
+}
+
+.em-feature-card p {
+	font-size: 0.82rem;
+	color: var(--em-muted);
+}
+
+/* بخش‌های صفحه اصلی */
+.em-section {
+	padding: 48px 0;
+}
+
+.em-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 28px;
+}
+
+.em-section-title {
+	font-size: 1.55rem;
+	font-weight: 800;
+	color: var(--em-dark);
+}
+
+.em-view-all {
+	color: var(--em-primary);
+	font-weight: 600;
+	font-size: 0.92rem;
+}
+
+/* کارت‌های دسته‌بندی سریع */
+.em-cat-pills-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 16px;
+}
+
+.em-cat-pill-card {
+	background: var(--em-surface);
+	padding: 20px 16px;
+	border-radius: var(--em-radius);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	border: 1px solid transparent;
+}
+
+.em-cat-pill-card:hover {
+	border-color: var(--em-primary);
+	background: #FFFFFF;
+	box-shadow: 0 8px 24px rgba(0, 82, 255, 0.07);
+}
+
+.em-cat-pill-card span {
+	font-size: 0.78rem;
+	color: var(--em-muted);
+}
+
+/* 4. شبکه و طراحی کارت محصول (منطبق با تصویر مرجع) */
+.em-products-grid {
+	display: grid;
+	grid-template-columns: repeat(var(--em-grid-cols, 4), 1fr);
+	gap: 24px;
+}
+
+.em-product-card {
+	display: flex;
+	flex-direction: column;
+}
+
+.em-card-media {
+	position: relative;
+	background-color: var(--em-surface);
+	border-radius: var(--em-radius);
+	aspect-ratio: 1 / 1.08;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 28px;
+	overflow: hidden;
+	margin-bottom: 14px;
+}
+
+.em-card-img-link img {
+	max-height: 200px;
+	width: auto;
+	object-fit: contain;
+	transition: transform 0.35s ease;
+}
+
+.em-product-card:hover .em-card-img-link img {
+	transform: scale(1.06);
+}
+
+.em-card-badges {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	z-index: 2;
+}
+
+.em-badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 6px;
+	font-size: 0.73rem;
+	font-weight: 800;
+	letter-spacing: 0.4px;
+}
+
+.em-badge-new {
+	background: #FFFFFF;
+	color: var(--em-dark);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.em-badge-discount {
+	background: var(--em-discount);
+	color: #FFFFFF;
+}
+
+.em-badge-out {
+	background: #6B7280;
+	color: #FFFFFF;
+}
+
+.em-card-quick-tools {
+	position: absolute;
+	top: 14px;
+	left: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	z-index: 2;
+}
+
+.em-tool-btn {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: #FFFFFF;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--em-dark);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+	transition: var(--em-transition);
+}
+
+.em-tool-btn:hover,
+.em-tool-btn.active {
+	background: var(--em-primary);
+	color: #FFFFFF;
+}
+
+.em-card-cta-overlay {
+	position: absolute;
+	bottom: 14px;
+	right: 14px;
+	left: 14px;
+	opacity: 0;
+	transform: translateY(10px);
+	transition: var(--em-transition);
+	z-index: 3;
+}
+
+.em-product-card:hover .em-card-cta-overlay {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.em-card-add-btn {
+	display: block;
+	width: 100%;
+	background: var(--em-dark);
+	color: #FFFFFF;
+	text-align: center;
+	padding: 10px 14px;
+	border-radius: 8px;
+	font-size: 0.85rem;
+	font-weight: 600;
+}
+
+.em-card-add-btn:hover {
+	background: var(--em-primary);
+}
+
+.em-card-meta-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 0.78rem;
+	margin-bottom: 4px;
+}
+
+.em-card-stars {
+	color: #111827;
+	letter-spacing: 1px;
+}
+
+.em-card-brand {
+	color: var(--em-muted);
+	font-weight: 500;
+}
+
+.em-card-title {
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--em-dark);
+	margin-bottom: 6px;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.em-card-price-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-weight: 700;
+	font-size: 0.95rem;
+}
+
+.em-price del {
+	color: var(--em-muted);
+	font-weight: 400;
+	font-size: 0.83rem;
+	margin-left: 6px;
+}
+
+.em-price ins {
+	text-decoration: none;
+	color: var(--em-dark);
+}
+
+.em-stock-dot {
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+
+.em-stock-dot.is-available {
+	color: var(--em-success);
+}
+
+.em-stock-dot.is-unavailable {
+	color: var(--em-discount);
+}
+
+/* 5. بخش Bento Grid (Shop Collection) دقیقاً مشابه تصویر مرجع */
+.em-bento-collection {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+}
+
+.em-bento-card {
+	background: var(--em-surface);
+	border-radius: var(--em-radius);
+	padding: 36px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	position: relative;
+	overflow: hidden;
+}
+
+.em-bento-tall {
+	min-height: 440px;
+}
+
+.em-bento-stack {
+	display: grid;
+	grid-template-rows: 1fr 1fr;
+	gap: 24px;
+}
+
+.em-bento-tag {
+	font-size: 0.8rem;
+	color: var(--em-primary);
+	font-weight: 700;
+}
+
+.em-bento-text h3 {
+	font-size: 1.45rem;
+	color: var(--em-dark);
+	margin: 6px 0 12px;
+}
+
+.em-bento-link {
+	font-weight: 700;
+	font-size: 0.9rem;
+	border-bottom: 2px solid var(--em-dark);
+	padding-bottom: 2px;
+}
+
+/* بنر تبلیغاتی و برندها */
+.em-promo-banner {
+	background: var(--em-dark);
+	color: #FFFFFF;
+	border-radius: 16px;
+	padding: 56px 48px;
+}
+
+.em-promo-badge {
+	background: var(--em-primary);
+	padding: 4px 12px;
+	border-radius: 99px;
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
+.em-promo-content h2 {
+	font-size: 2rem;
+	margin: 14px 0 10px;
+}
+
+.em-promo-content p {
+	color: #9CA3AF;
+	margin-bottom: 24px;
+}
+
+.em-brands-grid {
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	gap: 16px;
+}
+
+.em-brand-box {
+	background: var(--em-surface);
+	padding: 20px 12px;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: 800;
+	color: var(--em-muted);
+}
+
+.em-brand-box:hover {
+	color: var(--em-primary);
+	background: #FFFFFF;
+	box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+}
+
+/* 6. صفحه آرشیو و صفحه تک محصول */
+.em-shop-layout {
+	display: grid;
+	grid-template-columns: 280px 1fr;
+	gap: 36px;
+	padding: 48px 20px;
+}
+
+.em-filter-box {
+	background: var(--em-surface);
+	padding: 24px;
+	border-radius: var(--em-radius);
+}
+
+.em-filter-group {
+	margin-top: 18px;
+}
+
+.em-filter-group label {
+	display: block;
+	font-size: 0.88rem;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+.em-filter-input {
+	width: 100%;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--em-border);
+	font-family: inherit;
+	background: #FFFFFF;
+}
+
+.em-shop-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 24px;
+}
+
+.em-single-product-wrap {
+	padding: 48px 20px;
+}
+
+.em-single-top-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 48px;
+	margin-bottom: 56px;
+}
+
+.em-single-title {
+	font-size: 1.9rem;
+	margin: 8px 0 16px;
+}
+
+.em-single-utility-btns {
+	display: flex;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.em-tabs-nav {
+	display: flex;
+	gap: 16px;
+	border-bottom: 1px solid var(--em-border);
+	margin-bottom: 24px;
+}
+
+.em-tab-trigger {
+	background: none;
+	border: none;
+	border-bottom: 3px solid transparent;
+	padding: 12px 18px;
+	font-family: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.em-tab-trigger.active {
+	color: var(--em-primary);
+	border-bottom-color: var(--em-primary);
+}
+
+.em-tab-panel {
+	display: none;
+}
+
+.em-tab-panel.active {
+	display: block;
+}
+
+.em-specs-table,
+.em-compare-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.em-specs-table th,
+.em-specs-table td,
+.em-compare-table th,
+.em-compare-table td {
+	padding: 14px 16px;
+	border-bottom: 1px solid var(--em-border);
+	text-align: right;
+}
+
+.em-specs-table th {
+	width: 240px;
+	background: var(--em-surface);
+}
+
+/* 7. مودال‌ها و سبد خرید کشویی (Mini Cart Drawer) */
+.em-drawer {
+	position: fixed;
+	top: 0;
+	left: -400px;
+	width: 380px;
+	max-width: 90vw;
+	height: 100vh;
+	background: #FFFFFF;
+	z-index: 300;
+	padding: 24px;
+	transition: var(--em-transition);
+	box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+}
+
+.em-drawer.open {
+	left: 0;
+}
+
+.em-drawer-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--em-border);
+	margin-bottom: 16px;
+}
+
+.em-modal {
+	position: fixed;
+	inset: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	z-index: 310;
+	padding: 20px;
+}
+
+.em-modal.open {
+	display: flex;
+}
+
+.em-modal-content {
+	background: #FFFFFF;
+	border-radius: 16px;
+	max-width: 820px;
+	width: 100%;
+	padding: 32px;
+	position: relative;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+.em-modal-large {
+	max-width: 1080px;
+}
+
+.em-modal-close,
+.em-close-drawer {
+	background: none;
+	border: none;
+	font-size: 1.8rem;
+	cursor: pointer;
+}
+
+.em-qv-grid {
+	display: grid;
+	grid-template-columns: 1fr 1.1fr;
+	gap: 28px;
+	align-items: center;
+}
+
+.em-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(17, 24, 39, 0.45);
+	display: none;
+	z-index: 290;
+}
+
+.em-backdrop.open {
+	display: block;
+}
+
+/* فوتر */
+.em-footer {
+	background: var(--em-surface);
+	padding: 64px 0 24px;
+	margin-top: 64px;
+}
+
+.em-footer-grid {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+	gap: 36px;
+	padding-bottom: 40px;
+	border-bottom: 1px solid var(--em-border);
+}
+
+.em-footer-col h4 {
+	margin-bottom: 16px;
+}
+
+.em-footer-col ul {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.em-newsletter-form {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+.em-newsletter-form input {
+	flex: 1;
+	padding: 10px 14px;
+	border-radius: 8px;
+	border: 1px solid var(--em-border);
+	font-family: inherit;
+}
+
+.em-footer-bottom {
+	padding-top: 24px;
+	text-align: center;
+	font-size: 0.85rem;
+	color: var(--em-muted);
+}
+
+/* 8. طراحی واکنش‌گرا اختصاصی تبلت و موبایل (Responsive) */
+.em-mobile-menu-toggle {
+	display: none;
+}
+
+@media (max-width: 1024px) {
+	.em-products-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	.em-cat-pills-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	.em-brands-grid {
+		grid-template-columns: repeat(4, 1fr);
+	}
+	.em-shop-layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 768px) {
+	.em-mobile-menu-toggle {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		background: none;
+		border: none;
+		cursor: pointer;
+	}
+	.em-mobile-menu-toggle span {
+		width: 22px;
+		height: 2px;
+		background: var(--em-dark);
+	}
+	.em-main-nav {
+		display: none;
+		position: absolute;
+		top: 76px;
+		right: 0;
+		left: 0;
+		background: #FFFFFF;
+		padding: 20px;
+		border-bottom: 1px solid var(--em-border);
+	}
+	.em-main-nav.mobile-open {
+		display: block;
+	}
+	.em-nav-list {
+		flex-direction: column;
+		gap: 14px;
+	}
+	.em-search-wrapper {
+		width: 150px;
+	}
+	.em-hero-grid,
+	.em-bento-collection,
+	.em-single-top-grid,
+	.em-qv-grid,
+	.em-footer-grid {
+		grid-template-columns: 1fr;
+	}
+	.em-hero-title {
+		font-size: 2.1rem;
+	}
+	.em-features-grid,
+	.em-products-grid,
+	.em-cat-pills-grid,
+	.em-brands-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 14px;
+	}
+	/* در نسخه موبایل دکمه خرید کارت محصول همیشه بدون نیاز به هاور در دسترس است */
+	.em-card-cta-overlay {
+		opacity: 1;
+		transform: none;
+		position: static;
+		margin-top: 10px;
+	}
+	.em-card-media {
+		flex-direction: column;
+		padding: 16px;
+	}
+}
+
